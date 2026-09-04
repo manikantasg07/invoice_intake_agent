@@ -4,6 +4,7 @@ import json
 import os
 import anthropic
 from pydantic import BaseModel
+from tenacity import retry, stop_after_attempt, wait_random_exponential
 
 load_dotenv()
 
@@ -65,10 +66,11 @@ Thank you for your business!
 
 """
 
-total_tokens_used = 0
-total_computed_cost = 0
 
-try:
+@retry(reraise=True, stop=stop_after_attempt(3), wait=wait_random_exponential(min=1, max=10))
+def get_invoice_data(message: str) -> Invoice:
+    total_tokens_used = 0
+    total_computed_cost = 0
     messages=[
                 {
                     "role": "system",
@@ -106,6 +108,10 @@ try:
                     }
                 ]
                 continue
-        break           
+        break
+
+try:
+    # invoice_data = input("Enter the invoice text: ")
+    get_invoice_data(message)
 except Exception as e:
-    print(f"Error occurred: {e}")
+    print(f"Error extracting invoice data: {e}")        
