@@ -21,7 +21,7 @@ class Invoice(BaseModel):
     invoice_number: str
     date: str
     currency: str
-    line_items : list[dict[str, str,str,str]]
+    line_items : list[LineItem]
     tax : Decimal
     total : Decimal
 
@@ -73,10 +73,6 @@ def get_invoice_data(message: str) -> Invoice:
     total_computed_cost = 0
     messages=[
                 {
-                    "role": "system",
-                    "content": "You are a helpful assistant that extracts invoice data from raw text and returns it in a structured JSON format."
-                },
-                {
                     "role": "user",
                     "content": message
                 }
@@ -86,12 +82,13 @@ def get_invoice_data(message: str) -> Invoice:
         with client.messages.stream(
             model="claude-haiku-4-5-20251001",
             max_tokens=256,
+            system="You are a helpful assistant that extracts invoice data from raw text and returns it in a structured JSON format.",
             messages=messages,
             output_format=Invoice
         ) as stream:
             response = stream.get_final_message()
             total_tokens_used +=response.usage.input_tokens + response.usage.output_tokens
-            total_computed_cost+=response.usage.input_tokens*1+response.usage.output_tokens*5
+            total_computed_cost += (response.usage.input_tokens * 1 + response.usage.output_tokens * 5) / 1_000_000
             print(f"Total Tokens Used: {total_tokens_used}")
             print(f"Total Computed Cost: ${total_computed_cost}")
             if response.stop_reason == "end_turn":
