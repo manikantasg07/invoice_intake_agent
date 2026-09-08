@@ -13,7 +13,7 @@ import python_weather
 
 load_dotenv()
 
-client = anthropic.Anthropic(api_key=os.getenv("API_KEY"))
+client = anthropic.AsyncAnthropic(api_key=os.getenv("API_KEY"))
 
 # tools = [
 #     {
@@ -71,7 +71,7 @@ async def main():
         # tool_choice={"type": "auto", "disable_parallel_tool_use": True},
         messages=messages,
     )
-    final_text = runner.until_done()
+    final_text = await runner.until_done()
     for block in final_text.content:
         if block.type == "text":
             print(f"Model response: {block.text}")
