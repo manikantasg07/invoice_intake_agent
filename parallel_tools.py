@@ -109,9 +109,12 @@ async def main():
             messages=messages,
         )
 
-    final_text = next(
-        block.text for block in response.content if block.type == "text"
-    )
-    print(f"\nClaude's response:\n{final_text}")
+    # final_text = next(
+    #     block.text for block in response.content if block.type == "text"
+    # )
+    # print(f"\nClaude's response:\n{final_text}")
+    for block in response.content:
+        print("Block: ",block)
+        print()
 
 asyncio.run(main())
