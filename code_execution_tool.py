@@ -43,7 +43,7 @@ try:
     created_file_ids=[]
     while True:
         response = client.messages.create(
-            model="claude-opus-5",
+            model="claude-haiku-4-5",
             max_tokens=4096,
             messages=messages,
             tools=[{"type": "code_execution_20250825", "name": "code_execution"}],
